@@ -1,0 +1,35 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="./milligram.min.css">
+</head>
+
+<body>
+    <div class="container">
+
+        <h1>CoveShare</h1>
+        <form>
+            <fieldset>
+                <label for="message">Message</label>
+                <textarea placeholder="Enter your message here" id="message"></textarea>
+                 <label for="expiration">Expires in</label>
+                <select id="expiration">
+                    <option value="0">Never</option>
+                    <option value="7">1 Week</option>
+                    <option value="30" selected="selected">1 Month</option>
+                    <option value="90">3 Months</option>
+                </select>
+                <label for="allowedemails">Share with</label>
+
+                <input type="text" placeholder="example@example.com, example@example.com" id="nameField">
+                <input class="button-primary float-left" type="submit" value="Share message">
+            </fieldset>
+        </form>
+
+
+
+    </div>
+
+</body>
+
+</html>
