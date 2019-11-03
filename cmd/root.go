@@ -6,6 +6,7 @@ package cmd
 
 import (
   "fmt"
+  "github.com/zenzora/coveshare/config"
   "os"
   "github.com/spf13/cobra"
 
@@ -60,27 +61,36 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
+  configName := ".coveshare"
+
+  // Find home directory.
+  home, err := homedir.Dir()
+  if err != nil {
+    fmt.Println(err)
+    os.Exit(1)
+  }
+
   if cfgFile != "" {
     // Use config file from the flag.
     viper.SetConfigFile(cfgFile)
   } else {
-    // Find home directory.
-    home, err := homedir.Dir()
-    if err != nil {
-      fmt.Println(err)
-      os.Exit(1)
-    }
 
-    // Search config in home directory with name ".coveshare" (without extension).
     viper.AddConfigPath(home)
-    viper.SetConfigName(".coveshare")
+    viper.AddConfigPath(".")               // optionally look for config in the working directory
+    viper.SetConfigName(configName)
   }
 
   viper.AutomaticEnv() // read in environment variables that match
 
   // If a config file is found, read it in.
-  if err := viper.ReadInConfig(); err == nil {
-    fmt.Println("Using config file:", viper.ConfigFileUsed())
+  if err := viper.ReadInConfig(); err != nil {
+    if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+      fmt.Println("No config file found, generating default")
+      err = config.GenerateDefaultConfigFile(home + string(os.PathSeparator) +configName + ".yaml")
+      if err != nil {fmt.Println(err)}
+    } else {
+      fmt.Println(err)
+      os.Exit(1)    }
   }
 }
 
