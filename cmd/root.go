@@ -6,18 +6,16 @@ package cmd
 
 import (
   "fmt"
-  "github.com/zenzora/coveshare/config"
-  "os"
   "github.com/spf13/cobra"
+  "os"
 
-  homedir "github.com/mitchellh/go-homedir"
+  "github.com/mitchellh/go-homedir"
   "github.com/spf13/viper"
-
 )
 
 
 var cfgFile string
-
+var configName = ".coveshare"
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -61,7 +59,7 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-  configName := ".coveshare"
+
 
   // Find home directory.
   home, err := homedir.Dir()
@@ -85,9 +83,7 @@ func initConfig() {
   // If a config file is found, read it in.
   if err := viper.ReadInConfig(); err != nil {
     if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-      fmt.Println("No config file found, generating default")
-      err = config.GenerateDefaultConfigFile(home + string(os.PathSeparator) +configName + ".yaml")
-      if err != nil {fmt.Println(err)}
+
     } else {
       fmt.Println(err)
       os.Exit(1)    }
