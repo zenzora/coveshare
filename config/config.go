@@ -8,6 +8,7 @@ import (
 	"os"
 )
 
+// GenerateDefaultConfigFile generates a default config file including creating a new master key
 func GenerateDefaultConfigFile(path string) error {
 	// Check if file exists
 	if _, err := os.Stat(path); err == nil {

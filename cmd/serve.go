@@ -1,7 +1,3 @@
-/*
-Copyright © 2019 Jake Berkowsky
-
-*/
 package cmd
 
 import (
