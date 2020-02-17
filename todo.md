@@ -4,7 +4,7 @@ Need:
 - Dockerfile
 - Expiration support
 
-
+Want:
 
 - Integration with KMS
 - Expose routes for use with serverless

@@ -20,7 +20,7 @@ func Serve() {
 	router.GET("/", index)
 	router.POST("/", process)
 	// Doesn't work some times
-	router.GET("/d/:payload", decrypt)
+	router.GET("/d", decrypt)
 	router.GET("/milligram.min.css", css)
 
 	log.Fatal(http.ListenAndServe(":8080", router))
@@ -57,12 +57,7 @@ func process(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	encryptedMessage, _ := secret.Encrypt()
 	encryptedMessageString := base64.StdEncoding.EncodeToString(encryptedMessage)
 
-	link := "<a href=\"http://localhost:8080/d/" + url.QueryEscape(encryptedMessageString) + "\">Decrypt</a>"
-
-	log.Println(message)
-	log.Println(emails)
-	log.Println(expiration)
-	log.Println(encryptedMessage)
+	link := "<a href=\"http://localhost:8080/d?payload=" + url.QueryEscape(encryptedMessageString) + "\">Decrypt</a>"
 
 	fmt.Fprint(w, link)
 
@@ -71,7 +66,7 @@ func process(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 func decrypt(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	//Todo error handling etc...
 
-	payload := p.ByName("payload")
+	payload := r.FormValue("payload")
 	payloadSlice, _ := base64.StdEncoding.DecodeString(payload)
 	var secret secrets.Secrets
 	if viper.GetString("encryption-type") == "aes" {
