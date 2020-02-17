@@ -27,6 +27,7 @@ func Serve() {
 }
 
 func process(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	// Verify parameters
 	message := []byte(r.PostFormValue("message"))
 	emails := strings.Split(r.PostFormValue("allowedemails"), ",")
 	expiration, err := strconv.Atoi(r.PostFormValue("expiration"))
@@ -35,15 +36,25 @@ func process(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		// Return validation error
 		fmt.Fprint(w, err)
 	}
-	keyString := viper.GetString("key")
-	keySlice, err := base64.StdEncoding.DecodeString(keyString)
-	var key [32]byte
-	copy(key[:], keySlice)
 
-	if err != nil {
-		fmt.Fprint(w, err)
+	var secret secrets.Secrets
+	if viper.GetString("encryption-type") == "aes" {
+		var aess secrets.AesSecret
+		aess.PlainText = message
+
+		keyString := viper.GetString("key")
+		keySlice, err := base64.StdEncoding.DecodeString(keyString)
+		var key [32]byte
+		copy(key[:], keySlice)
+		aess.Key = &key
+		if err != nil {
+			fmt.Fprint(w, err)
+		}
+		secret = aess
+
 	}
-	encryptedMessage, _ := secrets.Encrypt(message, &key)
+
+	encryptedMessage, _ := secret.Encrypt()
 	encryptedMessageString := base64.StdEncoding.EncodeToString(encryptedMessage)
 
 	link := "<a href=\"http://localhost:8080/d/" + url.QueryEscape(encryptedMessageString) + "\">Decrypt</a>"
@@ -62,13 +73,23 @@ func decrypt(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 
 	payload := p.ByName("payload")
 	payloadSlice, _ := base64.StdEncoding.DecodeString(payload)
+	var secret secrets.Secrets
+	if viper.GetString("encryption-type") == "aes" {
+		var aess secrets.AesSecret
+		aess.CipherText = payloadSlice
 
-	keyString := viper.GetString("key")
-	keySlice, _ := base64.StdEncoding.DecodeString(keyString)
-	var key [32]byte
-	copy(key[:], keySlice)
+		keyString := viper.GetString("key")
+		keySlice, err := base64.StdEncoding.DecodeString(keyString)
+		var key [32]byte
+		copy(key[:], keySlice)
+		aess.Key = &key
+		if err != nil {
+			fmt.Fprint(w, err)
+		}
+		secret = aess
+	}
 
-	plaintext, _ := secrets.Decrypt(payloadSlice, &key)
+	plaintext, _ := secret.Decrypt()
 	printme := string(plaintext)
 	fmt.Fprint(w, printme)
 

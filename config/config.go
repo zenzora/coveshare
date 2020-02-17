@@ -5,6 +5,7 @@ import (
 	"errors"
 	"os"
 
+	"github.com/spf13/viper"
 	"github.com/zenzora/coveshare/secrets"
 	"gopkg.in/yaml.v2"
 )
@@ -28,7 +29,9 @@ func GenerateDefaultConfigFile(path string) error {
 	defer f.Close()
 
 	encoder := yaml.NewEncoder(f)
-	err = encoder.Encode(map[string]string{"key": base64.StdEncoding.EncodeToString(key[:])})
+	err = encoder.Encode(map[string]string{
+		"encryption": "aes",
+		"key":        base64.StdEncoding.EncodeToString(key[:])})
 	if err != nil {
 		return err
 	}
@@ -37,5 +40,20 @@ func GenerateDefaultConfigFile(path string) error {
 		return err
 	}
 
+	return nil
+}
+
+//Validate checks if the config is setup correctly
+func Validate() error {
+	// Validate the encryption type
+	encryptionType := viper.GetString("encryption-type")
+	if encryptionType == "aes" {
+		key, _ := base64.StdEncoding.DecodeString(viper.GetString("key"))
+		if len(key) != 32 {
+			return errors.New("aes key must be a 32 byte string ")
+		}
+	} else {
+		return errors.New("encryption type must be \"aes\"")
+	}
 	return nil
 }

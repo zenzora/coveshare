@@ -17,14 +17,15 @@ func GenerateNewKey() *[32]byte {
 	return &key
 }
 
-type AesSecret struct{
+//AesSecret is a type of secret, unlike KMS it needs a key
+type AesSecret struct {
 	Secret
-	key [32]byte
+	Key *[32]byte
 }
 
 // Encrypt function copied from: https://github.com/gtank/cryptopasta - CC License
-func Encrypt(plaintext []byte, key *[32]byte) (ciphertext []byte, err error) {
-	block, err := aes.NewCipher(key[:])
+func (aess AesSecret) Encrypt() (ciphertext []byte, err error) {
+	block, err := aes.NewCipher(aess.Key[:])
 	if err != nil {
 		return nil, err
 	}
@@ -40,12 +41,12 @@ func Encrypt(plaintext []byte, key *[32]byte) (ciphertext []byte, err error) {
 		return nil, err
 	}
 
-	return gcm.Seal(nonce, nonce, plaintext, nil), nil
+	return gcm.Seal(nonce, nonce, aess.PlainText, nil), nil
 }
 
 // Decrypt function copied from: https://github.com/gtank/cryptopasta - CC License
-func Decrypt(ciphertext []byte, key *[32]byte) (plaintext []byte, err error) {
-	block, err := aes.NewCipher(key[:])
+func (aess AesSecret) Decrypt() (plaintext []byte, err error) {
+	block, err := aes.NewCipher(aess.Key[:])
 	if err != nil {
 		return nil, err
 	}
@@ -55,13 +56,13 @@ func Decrypt(ciphertext []byte, key *[32]byte) (plaintext []byte, err error) {
 		return nil, err
 	}
 
-	if len(ciphertext) < gcm.NonceSize() {
+	if len(aess.CipherText) < gcm.NonceSize() {
 		return nil, errors.New("malformed ciphertext")
 	}
 
 	return gcm.Open(nil,
-		ciphertext[:gcm.NonceSize()],
-		ciphertext[gcm.NonceSize():],
+		aess.CipherText[:gcm.NonceSize()],
+		aess.CipherText[gcm.NonceSize():],
 		nil,
 	)
 }
