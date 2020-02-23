@@ -3,6 +3,7 @@ Need:
 - Email identity support
 - Dockerfile
 - Expiration support
+- Better error handling for webserver requests (some sort of 403 and logging)
 
 Want:
 
@@ -12,3 +13,6 @@ Want:
 - Deploy with AWS button (serverless and KMS)
 - Bundle assets in memory instead of in the function
 - Rewrite CSS
+- min expiration
+- default expiration
+- memory bundler for files instead of inline

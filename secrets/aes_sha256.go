@@ -17,35 +17,36 @@ func GenerateNewKey() *[32]byte {
 	return &key
 }
 
-//AesSecret is a type of secret, unlike KMS it needs a key
-type AesSecret struct {
+//AesSha256Secret is a type of secret, unlike KMS it needs a key
+type AesSha256Secret struct {
 	Secret
 	Key *[32]byte
 }
 
-// Encrypt function copied from: https://github.com/gtank/cryptopasta - CC License
-func (aess AesSecret) Encrypt() (ciphertext []byte, err error) {
+// Encrypt function, copied from: https://github.com/gtank/cryptopasta - CC License
+func (aess AesSha256Secret) Encrypt() (err error) {
 	block, err := aes.NewCipher(aess.Key[:])
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	gcm, err := cipher.NewGCM(block)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	nonce := make([]byte, gcm.NonceSize())
 	_, err = io.ReadFull(rand.Reader, nonce)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return gcm.Seal(nonce, nonce, aess.PlainText, nil), nil
+	aess.CipherText = gcm.Seal(nonce, nonce, aess.PlainText, nil)
+	return nil
 }
 
 // Decrypt function copied from: https://github.com/gtank/cryptopasta - CC License
-func (aess AesSecret) Decrypt() (plaintext []byte, err error) {
+func (aess AesSha256Secret) Decrypt() (plaintext []byte, err error) {
 	block, err := aes.NewCipher(aess.Key[:])
 	if err != nil {
 		return nil, err
@@ -65,4 +66,14 @@ func (aess AesSecret) Decrypt() (plaintext []byte, err error) {
 		aess.CipherText[gcm.NonceSize():],
 		nil,
 	)
+}
+
+//GetCipherText returns the value of the ciphertext
+func (aess AesSha256Secret) GetCipherText() []byte {
+	return aess.CipherText
+}
+
+//GetCipherText returns the value of the ciphertext
+func (aess AesSha256Secret) GetPlainText() []byte {
+	return aess.PlainText
 }

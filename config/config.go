@@ -30,8 +30,10 @@ func GenerateDefaultConfigFile(path string) error {
 
 	encoder := yaml.NewEncoder(f)
 	err = encoder.Encode(map[string]string{
-		"encryption": "aes",
-		"key":        base64.StdEncoding.EncodeToString(key[:])})
+		"encryption-type": "aes-sha256",
+		"key":             base64.StdEncoding.EncodeToString(key[:]),
+	})
+
 	if err != nil {
 		return err
 	}
@@ -47,13 +49,13 @@ func GenerateDefaultConfigFile(path string) error {
 func Validate() error {
 	// Validate the encryption type
 	encryptionType := viper.GetString("encryption-type")
-	if encryptionType == "aes" {
+	if encryptionType == "aes-sha256" {
 		key, _ := base64.StdEncoding.DecodeString(viper.GetString("key"))
 		if len(key) != 32 {
-			return errors.New("aes key must be a 32 byte string ")
+			return errors.New("key must be a 32 byte string ")
 		}
 	} else {
-		return errors.New("encryption type must be \"aes\"")
+		return errors.New("encryption type must be \"aes-sha256\"")
 	}
 	return nil
 }

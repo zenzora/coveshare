@@ -2,14 +2,15 @@ package server
 
 import (
 	"fmt"
-	"github.com/julienschmidt/httprouter"
 	"net/http"
+
+	"github.com/julienschmidt/httprouter"
 )
 
 func index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-header := w.Header()
-header.Set("Content-Type", "text/html")
-fmt.Fprint(w,`<html>
+	header := w.Header()
+	header.Set("Content-Type", "text/html")
+	fmt.Fprint(w, `<html>
 
 	<head>
 	<link rel="stylesheet" href="./milligram.min.css">
@@ -46,10 +47,10 @@ fmt.Fprint(w,`<html>
 	</html>`)
 }
 
-func css(w http.ResponseWriter, r *http.Request, _ httprouter.Params){
-header := w.Header()
-header.Set("Content-Type", "text/css")
-fmt.Fprint(w,`
+func css(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	header := w.Header()
+	header.Set("Content-Type", "text/css")
+	fmt.Fprint(w, `
 /*!
 * Milligram v1.3.0
 * https://milligram.github.io
@@ -62,4 +63,3 @@ fmt.Fprint(w,`
 
 	`)
 }
-

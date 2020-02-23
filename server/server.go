@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
-	"strings"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/spf13/viper"
@@ -29,17 +28,18 @@ func Serve() {
 func process(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	// Verify parameters
 	message := []byte(r.PostFormValue("message"))
-	emails := strings.Split(r.PostFormValue("allowedemails"), ",")
-	expiration, err := strconv.Atoi(r.PostFormValue("expiration"))
-
+	//emails := strings.Split(r.PostFormValue("allowedemails"), ",")
+	_, err := strconv.Atoi(r.PostFormValue("expiration"))
 	if err != nil {
 		// Return validation error
 		fmt.Fprint(w, err)
 	}
 
 	var secret secrets.Secrets
-	if viper.GetString("encryption-type") == "aes" {
-		var aess secrets.AesSecret
+
+	// Configuration for AES-SHA256 encryption type
+	if viper.GetString("encryption-type") == "aes-sha256" {
+		var aess secrets.AesSha256Secret
 		aess.PlainText = message
 
 		keyString := viper.GetString("key")
@@ -51,10 +51,14 @@ func process(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 			fmt.Fprint(w, err)
 		}
 		secret = aess
-
 	}
 
-	encryptedMessage, _ := secret.Encrypt()
+	err = secret.Encrypt()
+	if err != nil {
+		fmt.Fprint(w, err)
+	}
+
+	encryptedMessage := secret.GetCipherText()
 	encryptedMessageString := base64.StdEncoding.EncodeToString(encryptedMessage)
 
 	link := "<a href=\"http://localhost:8080/d?payload=" + url.QueryEscape(encryptedMessageString) + "\">Decrypt</a>"
@@ -69,8 +73,9 @@ func decrypt(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	payload := r.FormValue("payload")
 	payloadSlice, _ := base64.StdEncoding.DecodeString(payload)
 	var secret secrets.Secrets
-	if viper.GetString("encryption-type") == "aes" {
-		var aess secrets.AesSecret
+	// Configuration for AES-SHA256 encryption type
+	if viper.GetString("encryption-type") == "aes-sha256" {
+		var aess secrets.AesSha256Secret
 		aess.CipherText = payloadSlice
 
 		keyString := viper.GetString("key")
@@ -84,8 +89,8 @@ func decrypt(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		secret = aess
 	}
 
-	plaintext, _ := secret.Decrypt()
-	printme := string(plaintext)
+	secret.Decrypt()
+	printme := string(secret.GetPlainText())
 	fmt.Fprint(w, printme)
 
 }
