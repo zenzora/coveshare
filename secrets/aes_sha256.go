@@ -73,7 +73,7 @@ func (aess AesSha256Secret) GetCipherText() []byte {
 	return aess.CipherText
 }
 
-//GetCipherText returns the value of the ciphertext
+//GetPlainText returns the value of the plaintext
 func (aess AesSha256Secret) GetPlainText() []byte {
 	return aess.PlainText
 }
