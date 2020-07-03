@@ -24,7 +24,7 @@ type AesSha256Secret struct {
 }
 
 // Encrypt function, copied from: https://github.com/gtank/cryptopasta - CC License
-func (aess AesSha256Secret) Encrypt() (err error) {
+func (aess *AesSha256Secret) Encrypt() (err error) {
 	block, err := aes.NewCipher(aess.Key[:])
 	if err != nil {
 		return err
@@ -40,32 +40,35 @@ func (aess AesSha256Secret) Encrypt() (err error) {
 	if err != nil {
 		return err
 	}
-
 	aess.CipherText = gcm.Seal(nonce, nonce, aess.PlainText, nil)
+
 	return nil
 }
 
 // Decrypt function copied from: https://github.com/gtank/cryptopasta - CC License
-func (aess AesSha256Secret) Decrypt() (plaintext []byte, err error) {
+func (aess AesSha256Secret) Decrypt() (err error) {
 	block, err := aes.NewCipher(aess.Key[:])
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	gcm, err := cipher.NewGCM(block)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	if len(aess.CipherText) < gcm.NonceSize() {
-		return nil, errors.New("malformed ciphertext")
+		return errors.New("malformed ciphertext")
 	}
 
-	return gcm.Open(nil,
+	aess.PlainText, err = gcm.Open(nil,
 		aess.CipherText[:gcm.NonceSize()],
 		aess.CipherText[gcm.NonceSize():],
 		nil,
 	)
+
+	return err
+
 }
 
 //GetCipherText returns the value of the ciphertext

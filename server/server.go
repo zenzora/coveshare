@@ -9,19 +9,27 @@ import (
 	"strconv"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/rakyll/statik/fs"
+
 	"github.com/spf13/viper"
 	"github.com/zenzora/coveshare/secrets"
+	_ "github.com/zenzora/coveshare/statik" // Generated "Statik" fs
 )
 
 //Serve serves the server things that need serving
 func Serve() {
 	router := httprouter.New()
-	router.GET("/", index)
+
 	router.POST("/", process)
 	// Doesn't work some times
 	router.GET("/d", decrypt)
-	router.GET("/milligram.min.css", css)
-
+	router.HandleMethodNotAllowed = false
+	// This bit serves all the files in "public"
+	statikFS, err := fs.New()
+	if err != nil {
+		log.Fatal(err)
+	}
+	router.NotFound = http.FileServer(statikFS)
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
 
@@ -50,10 +58,11 @@ func process(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		if err != nil {
 			fmt.Fprint(w, err)
 		}
-		secret = aess
+		secret = &aess
 	}
-
 	err = secret.Encrypt()
+	log.Println(string(secret.GetCipherText()))
+
 	if err != nil {
 		fmt.Fprint(w, err)
 	}
@@ -86,10 +95,13 @@ func decrypt(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		if err != nil {
 			fmt.Fprint(w, err)
 		}
-		secret = aess
+		secret = &aess
 	}
 
-	secret.Decrypt()
+	err := secret.Decrypt()
+	if err != nil {
+		log.Println(err)
+	}
 	printme := string(secret.GetPlainText())
 	fmt.Fprint(w, printme)
 

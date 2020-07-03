@@ -5,7 +5,7 @@ import "time"
 //Secrets interface can encrypt and decrypt
 type Secrets interface {
 	Encrypt() error
-	Decrypt() ([]byte, error)
+	Decrypt() error
 	GetCipherText() []byte
 	GetPlainText() []byte
 	//SetPlainText([]byte) error

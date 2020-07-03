@@ -26,6 +26,7 @@ func GenerateDefaultConfigFile(path string) error {
 	if err != nil {
 		return err
 	}
+	// #nosec G307 - Defering something that can cause an error, this is acceptable for this usecase
 	defer f.Close()
 
 	encoder := yaml.NewEncoder(f)
