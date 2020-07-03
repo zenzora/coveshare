@@ -31,7 +31,7 @@ func GenerateDefaultConfigFile(path string) error {
 
 	encoder := yaml.NewEncoder(f)
 	err = encoder.Encode(map[string]string{
-		"encryption-type": "aes-sha256",
+		"encryption_type": "aes-sha256",
 		"key":             base64.StdEncoding.EncodeToString(key[:]),
 	})
 
@@ -49,7 +49,7 @@ func GenerateDefaultConfigFile(path string) error {
 //Validate checks if the config is setup correctly
 func Validate() error {
 	// Validate the encryption type
-	encryptionType := viper.GetString("encryption-type")
+	encryptionType := viper.GetString("encryption_type")
 	if encryptionType == "aes-sha256" {
 		key, _ := base64.StdEncoding.DecodeString(viper.GetString("key"))
 		if len(key) != 32 {
@@ -57,6 +57,9 @@ func Validate() error {
 		}
 	} else {
 		return errors.New("encryption type must be \"aes-sha256\"")
+	}
+	if viper.IsSet("root_addr") == false {
+		return errors.New("root_addr must be set")
 	}
 	return nil
 }

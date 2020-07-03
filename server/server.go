@@ -46,7 +46,7 @@ func process(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	var secret secrets.Secrets
 
 	// Configuration for AES-SHA256 encryption type
-	if viper.GetString("encryption-type") == "aes-sha256" {
+	if viper.GetString("encryption_type") == "aes-sha256" {
 		var aess secrets.AesSha256Secret
 		aess.PlainText = message
 
@@ -83,7 +83,7 @@ func decrypt(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	payloadSlice, _ := base64.StdEncoding.DecodeString(payload)
 	var secret secrets.Secrets
 	// Configuration for AES-SHA256 encryption type
-	if viper.GetString("encryption-type") == "aes-sha256" {
+	if viper.GetString("encryption_type") == "aes-sha256" {
 		var aess secrets.AesSha256Secret
 		aess.CipherText = payloadSlice
 

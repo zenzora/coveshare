@@ -15,4 +15,3 @@ Want:
 - Rewrite CSS
 - min expiration
 - default expiration
-- memory bundler for files instead of inline

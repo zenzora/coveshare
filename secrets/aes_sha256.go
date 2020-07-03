@@ -46,7 +46,7 @@ func (aess *AesSha256Secret) Encrypt() (err error) {
 }
 
 // Decrypt function copied from: https://github.com/gtank/cryptopasta - CC License
-func (aess AesSha256Secret) Decrypt() (err error) {
+func (aess *AesSha256Secret) Decrypt() (err error) {
 	block, err := aes.NewCipher(aess.Key[:])
 	if err != nil {
 		return err

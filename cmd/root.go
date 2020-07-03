@@ -63,7 +63,7 @@ func initConfig() {
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match
-
+	viper.SetEnvPrefix("coveshare")
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
