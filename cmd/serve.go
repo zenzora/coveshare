@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -28,6 +29,10 @@ var serveCmd = &cobra.Command{
 
 func init() {
 	serveCmd.Flags().String("base_url", "", "Prefix to format internal links eg (https://my.secret.com or http://localhost:8080)")
-	viper.BindPFlag("base_url", serveCmd.Flags().Lookup("base_url"))
+	err := viper.BindPFlag("base_url", serveCmd.Flags().Lookup("base_url"))
+	if err != nil {
+		log.Fatal("Error binding base_url to viper")
+	}
+
 	rootCmd.AddCommand(serveCmd)
 }
