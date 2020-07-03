@@ -58,8 +58,8 @@ func Validate() error {
 	} else {
 		return errors.New("encryption type must be \"aes-sha256\"")
 	}
-	if viper.IsSet("root_addr") == false {
-		return errors.New("root_addr must be set")
+	if viper.GetString("base_url") == "" {
+		return errors.New("base_url must be set")
 	}
 	return nil
 }
