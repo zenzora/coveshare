@@ -61,7 +61,6 @@ func process(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		secret = &aess
 	}
 	err = secret.Encrypt()
-	log.Println(string(secret.GetCipherText()))
 
 	if err != nil {
 		fmt.Fprint(w, err)
@@ -70,7 +69,7 @@ func process(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	encryptedMessage := secret.GetCipherText()
 	encryptedMessageString := base64.StdEncoding.EncodeToString(encryptedMessage)
 
-	link := "<a href=\"http://localhost:8080/d?payload=" + url.QueryEscape(encryptedMessageString) + "\">Decrypt</a>"
+	link := "<a href=\"" + viper.GetString("base_url") + "/d?payload=" + url.QueryEscape(encryptedMessageString) + "\">Decrypt</a>"
 
 	fmt.Fprint(w, link)
 
