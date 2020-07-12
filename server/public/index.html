@@ -8,7 +8,7 @@
 		<div class='container'>
 
 			<h1>CoveShare</h1>
-			<form method="POST">
+			<form id="encrypt" method="POST">
 				<fieldset>
 					<label for='message'>Message</label>
 					<textarea placeholder='Enter your message here' id='message' name="message"></textarea>
@@ -25,6 +25,32 @@
 					<input class='button-primary float-left' type='submit' value='Share message'>
 				</fieldset>
 			</form>
+			<div id='secretLinkSection' style="display: none;">
+				<input type="text" placeholder="link to secret" id="secretLink">
+				<a id="copy" class="button button-outline"  href="#">Copy Link</a>
+			</div>
+			<script>
+				encrypt.onsubmit = async (e) => {
+				  e.preventDefault();
+			  
+				  let response = await fetch('/api/encrypt', {
+					method: 'POST',
+					body: new FormData(encrypt)
+				  });
+			  
+				  let result = await response;
+				  var secretLink = document.getElementById("secretLink");
+				  secretLink.value = await response.text()
+				  secretLinkSection.style.display = "block";
+				};
+
+				copy.onclick = function(){
+					var secretLink = document.getElementById("secretLink");
+					secretLink.select();
+					secretLink.setSelectionRange(0, 99999); /*For mobile devices*/
+					document.execCommand("copy");
+				} 
+			  </script>
 
 
 
