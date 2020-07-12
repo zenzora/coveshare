@@ -22,7 +22,7 @@ var serveCmd = &cobra.Command{
 			fmt.Println(validationError)
 			os.Exit(1)
 		}
-		fmt.Println("Serving on port 8080")
+		fmt.Println("Serving on port " + viper.GetString("port"))
 		server.Serve()
 	},
 }
@@ -32,6 +32,12 @@ func init() {
 	err := viper.BindPFlag("base_url", serveCmd.Flags().Lookup("base_url"))
 	if err != nil {
 		log.Fatal("Error binding base_url to viper")
+	}
+
+	serveCmd.Flags().String("port", "80", "port")
+	err = viper.BindPFlag("port", serveCmd.Flags().Lookup("port"))
+	if err != nil {
+		log.Fatal("Error binding port to viper")
 	}
 
 	rootCmd.AddCommand(serveCmd)

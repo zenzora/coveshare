@@ -30,7 +30,7 @@ func Serve() {
 		log.Fatal(err)
 	}
 	router.NotFound = http.FileServer(statikFS)
-	log.Fatal(http.ListenAndServe(":8080", router))
+	log.Fatal(http.ListenAndServe(":"+viper.GetString("port"), router))
 }
 
 func process(w http.ResponseWriter, r *http.Request, p httprouter.Params) {

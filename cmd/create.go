@@ -2,10 +2,11 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/zenzora/coveshare/config"
-	"os"
 )
 
 // createCmd represents the create command
@@ -19,10 +20,10 @@ var createCmd = &cobra.Command{
 			fmt.Println(err)
 			os.Exit(1)
 		}
-		err = config.GenerateDefaultConfigFile(home + string(os.PathSeparator) +configName + ".yaml")
-		if err != nil{
-			fmt.Printf("Error creating default config: %s \n",err)
-		}else{
+		err = config.GenerateDefaultConfigFile(home + string(os.PathSeparator) + configName + ".yaml")
+		if err != nil {
+			fmt.Printf("Error creating default config: %s \n", err)
+		} else {
 			fmt.Println("Default config created")
 		}
 	},
