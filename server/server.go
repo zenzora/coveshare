@@ -6,6 +6,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/rakyll/statik/fs"
+	"github.com/spf13/viper"
 
 	_ "github.com/zenzora/coveshare/statik" // Generated "Statik" fs
 )
