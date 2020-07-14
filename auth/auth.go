@@ -23,9 +23,6 @@ func CreateLoginCode(email string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	keyString := viper.GetString("key")
 	ss, err := token.SignedString(keyString)
-	if err != nil {
-		return ss, nil
-	}
 	return ss, err
 }
 
